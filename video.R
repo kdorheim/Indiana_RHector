@@ -156,26 +156,26 @@ run_with_param_range <- function(core, values){
 }
 
 # run_with_param_range()
-ECS_values = seq(from = 1.5, to = 4.5, length.out = 10)
-ECS_values
+# CMIP5 2.1 to 4.7 C
+# CMIP6 1.8 to 5.6 C
 
-data_rcp85 = run_with_param_range(core = hector_rcp85, values = ECS_values)
+cmip5_ecs_values = seq(from = 2.1, to = 4.7, length.out = 10)
+cmip6_ecs_vvalues = seq(from = 1.8, to = 5.6, length.out = 10)
 
-# repeate for the rcp 26 scenario
-ini_file = system.file("input/hector_rcp26.ini", package = "hector")
-hector_rcp26 = newcore(inifile = ini_file)
-data_rcp26 = run_with_param_range(hector_rcp26, values = ECS_values)
+ini = system.file("input/hector_rcp45.ini", package = "hector")
+hcore = newcore(ini)
 
-# modify the scenario names
-data_rcp26$scenario = "rcp26"
-data_rcp85$scenario = "rcp85"
+cmip5_out = run_with_param_range(hcore, cmip5_ecs_values)
+cmip5_out$scenario = "CMIP5"
 
-# combine into a single data frame
-data = rbind(data_rcp26, data_rcp85)
+cmip6_out = run_with_param_range(hcore, cmip6_ecs_vvalues)
+cmip6_out$scenario = "CMIP6"
 
-# plot
-ggplot(data = data) + 
-  geom_line(aes(year, value, color = ECS, linetype = scenario)) +
-  facet_wrap("variable", scales = "free")
+data = rbind(cmip5_out, cmip6_out)
+
+
+ggplot(data) + 
+  geom_line(aes(year, value, color = scenario, group = ECS)) + 
+  facet_wrap("variable", scales = "free", ncol = 1)
 
 
